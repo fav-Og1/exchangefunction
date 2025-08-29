@@ -24,7 +24,7 @@ export default async function ({ req, res, log }) {
 
     const databases = new Databases(client)
     try {
-        const response = await fetch(`https://api.exchangerate.host/latest?base=USD?access_key=${process.env.PUBLIC_API_EXCHANGE_RATES_KEY}`);
+        const response = await fetch(`https://api.exchangerate.host/live?access_key=${process.env.PUBLIC_API_EXCHANGE_RATES_KEY}`);
         const data = await response.json();
 
         log(`Fetched data: ${JSON.stringify(data)}`);
