@@ -59,10 +59,8 @@ export default async function ({ req, res, log }) {
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { ...data },
-                    [
-                        Permission.read(Role.any)
-                    ]
+                    { ...data }
+                   
                 );
                 log(`Create result: ${JSON.stringify(createResult)}`);
                 return res.text('Exchange rate saved successfully.');
