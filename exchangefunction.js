@@ -26,8 +26,10 @@ export default async function ({ req, res, log }) {
     try {
         const response = await fetch(`https://api.exchangerate.host/live?access_key=${process.env.PUBLIC_API_EXCHANGE_RATES_KEY}`);
         const data = await response.json();
+        const stringedData = JSON.stringify(data)
 
         log(`Fetched data: ${JSON.stringify(data)}`);
+         console.log(`Fetched data: ${JSON.stringify(data)}`)
 
         if (data) {
             const docId = data.date || new Date().toISOString().slice(0, 10);
@@ -47,18 +49,21 @@ export default async function ({ req, res, log }) {
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { pairValues: data }
+                    { pairValues: stringedData }
                 );
                 log(`Update result: ${JSON.stringify(updateResult)}`);
+                 console.log(`Update result: ${JSON.stringify(updateResult)}`);
                 return res.text('Exchange rate updated successfully.');
             } else {
                 const createResult = await databases.createDocument(
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { pairValues: data }
+                    { pairValues: stringedData }
                 );
                 log(`Create result: ${JSON.stringify(createResult)}`);
+                console.log(`Create result: ${JSON.stringify(createResult)}`);
+
                 return res.text('Exchange rate saved successfully.');
             }
         } else {
