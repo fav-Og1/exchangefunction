@@ -32,7 +32,6 @@ export default async function ({ req, res, log }) {
         if (data) {
             const docId = data.date || new Date().toISOString().slice(0, 10);
 
-            // Check if document for this date already exists
             const existing = await databases.listDocuments(
                 DB_ID,
                 EX_COL_ID,
@@ -44,23 +43,20 @@ export default async function ({ req, res, log }) {
             log(`Existing documents: ${JSON.stringify(existing.documents)}`);
 
             if (existing.documents.length > 0) {
-                // Update existing document
                 const updateResult = await databases.updateDocument(
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { ...data }
+                    { pairValues: data }
                 );
                 log(`Update result: ${JSON.stringify(updateResult)}`);
                 return res.text('Exchange rate updated successfully.');
             } else {
-                // Create new document
                 const createResult = await databases.createDocument(
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { ...data }
-                   
+                    { pairValues: data }
                 );
                 log(`Create result: ${JSON.stringify(createResult)}`);
                 return res.text('Exchange rate saved successfully.');
@@ -75,3 +71,7 @@ export default async function ({ req, res, log }) {
     }
 
 };
+      
+    
+
+
