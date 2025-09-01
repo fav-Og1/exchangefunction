@@ -20,7 +20,7 @@ export default async function ({ req, res, log }) {
     const client = new Client()
         .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
         .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
-        .setKey(req.headers['x-appwrite-key'] ?? '');
+        .setKey(process.env.APPWRITE_API_KEY);
 
     const databases = new Databases(client)
     try {
@@ -73,5 +73,5 @@ export default async function ({ req, res, log }) {
         log(`Error: ${error.message}`);
         return res.text(error.message)
     }
-    return res.text('Invalid path');
+
 };
