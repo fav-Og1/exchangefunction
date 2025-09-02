@@ -26,13 +26,26 @@ export default async function ({ req, res, log }) {
     try {
         const response = await fetch(`https://api.exchangerate.host/live?access_key=${process.env.PUBLIC_API_EXCHANGE_RATES_KEY}`);
         const data = await response.json();
-        const stringedData = JSON.stringify(data)
+        
+        
+        if (!data || !data.rates) {
+            log('No exchange rate data received.');
+            return res.text('No exchange rate data received.');
+        }
 
-        log(`Fetched data: ${JSON.stringify(data)}`);
-         console.log(`Fetched data: ${JSON.stringify(data)}`)
+        const rates = data.rates;
 
-        if (data) {
-            const docId = data.date || new Date().toISOString().slice(0, 10);
+    // Convert rates to a formatted string
+    const formattedRates = Object.entries(rates)
+      .map(([currency, rate]) => `${currency}: ${rate}`)
+      .join(', ');
+
+        log(`Fetched data: ${JSON.stringify(formattedRates)}`);
+         console.log(`Fetched data: ${JSON.stringify(formattedRates)}`)
+
+//check for previous existing data
+        if (formattedRates) {
+            const docId = new Date().toISOString().slice(0, 10); 
 
             const existing = await databases.listDocuments(
                 DB_ID,
@@ -49,7 +62,7 @@ export default async function ({ req, res, log }) {
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { pairValues: stringedData }
+                    { pairValues: formattedRates }
                 );
                 log(`Update result: ${JSON.stringify(updateResult)}`);
                  console.log(`Update result: ${JSON.stringify(updateResult)}`);
@@ -59,7 +72,7 @@ export default async function ({ req, res, log }) {
                     DB_ID,
                     EX_COL_ID,
                     docId,
-                    { pairValues: stringedData }
+                    { pairValues: formattedRates }
                 );
                 log(`Create result: ${JSON.stringify(createResult)}`);
                 console.log(`Create result: ${JSON.stringify(createResult)}`);
@@ -72,7 +85,9 @@ export default async function ({ req, res, log }) {
         }
     } catch (error) {
         log(`Error: ${error.message}`);
-        return res.text(error.message)
+         log(`Error occurred: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+        return res.text(`Error: ${error.message}`);
+    
     }
 
 };
