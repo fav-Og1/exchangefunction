@@ -24,16 +24,20 @@ export default async function ({ req, res, log }) {
 
     const databases = new Databases(client)
     try {
-        const response = await fetch(`https://api.exchangerate.host/live?access_key=${process.env.PUBLIC_API_EXCHANGE_RATES_KEY}`);
+        const response = await fetch(`https://api.exchangerate.host/live?base=USD&access_key=${process.env.PUBLIC_API_EXCHANGE_RATES_KEY}`);
         const data = await response.json();
+        const stringedData = JSON.stringify(data)
+
+        log(`Fetched data: ${JSON.stringify(data)}`);
+        log(`Fetched data: ${JSON.stringify(stringedData)}`);
+         console.log(`Fetched data: ${JSON.stringify(data)}`)
         
-        
-        if (!data || !data.rates) {
+        if (!data) {
             log('No exchange rate data received.');
             return res.text('No exchange rate data received.');
         }
 
-        const rates = data.rates;
+        const rates = data.quotes
 
     // Convert rates to a formatted string
     const formattedRates = Object.entries(rates)
